@@ -1,0 +1,27 @@
+body {
+  text-align: center;
+  outline: 1px;
+}
+
+button {
+  padding: 0.5vw 1vw;
+  font-size: 5em;
+  background-color: #1f611f;
+  color: lime
+}
+
+button:hover {
+  cursor: pointer;
+  color: #1f611f;
+  background-color: lime
+}
+
+p {
+  font-size: 5em;
+}
+
+.header {
+  font-size: 5vh;
+  border-bottom: 1px solid black;
+  padding-bottom: 5vh;
+}
