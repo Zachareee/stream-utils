@@ -5,13 +5,13 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@replit/database": "^2.0.2",
     "@types/node": "^18.0.6",
     "express": "^4.18.2",
     "lowdb": "^7.0.1",
