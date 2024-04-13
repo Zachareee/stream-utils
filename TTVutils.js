@@ -100,8 +100,6 @@ function saveToken(data) {
   const { access_token: access = null, refresh_token: refresh = null } = data;
   db.update((data) => {
     data.token = `Bearer ${access}`;
-  });
-  db.update((data) => {
     data.refresh = refresh;
   });
 }
