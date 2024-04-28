@@ -27,12 +27,11 @@ export function verifyTTVHash() {
 export function gen_state() {
   const buffer = randomBytes(20);
   const state = buffer.toString("hex");
-  db.update((data) => (data.state = state));
-  return state;
+  return Memory.setState(state)
 }
 
 export async function check_state(test) {
-  return db.data.state === test;
+  return Memory.getState() === test;
 }
 
 export async function use_code(code) {
@@ -55,7 +54,7 @@ export async function use_code(code) {
 
 export async function TTVinfo() {
   const token = await tokenEval();
-  if (token == null) return null;
+  if (!token) return null;
   const options = {
     method: "GET",
     headers: {
@@ -72,15 +71,12 @@ export async function TTVinfo() {
   result = await fetch(endpoint, options);
   response = await result.json();
   const { box_art_url: art } = response.data[0];
-  return {
-    title: title,
-    game: game,
-    art: `${art.split("-{width}x{height}")[0]}.jpg`,
+  return { title, game, art: `${art.split("-{width}x{height}")[0]}.jpg`,
   };
 }
 
 export async function tokenEval() {
-  const token = await db.data.token;
+  const { token } = db.data
   const result = await fetch("https://id.twitch.tv/oauth2/validate", {
     method: "GET",
     headers: {
@@ -96,44 +92,55 @@ export async function tokenEval() {
   return await refreshToken();
 }
 
-function saveToken(data) {
+async function saveToken(data) {
   const { access_token: access = null, refresh_token: refresh = null } = data;
-  db.update((data) => {
-    data.token = `Bearer ${access}`;
-    data.refresh = refresh;
-  });
+  await db.update(data => {
+    data.token = `Bearer ${access}`
+    data.refresh = refresh
+  })
 }
 
 async function refreshToken() {
-  const refresh = db.data.refresh;
+  const { refresh } = db.data
   const body =
     `grant_type=refresh_token&` +
     `refresh_token=${refresh}&` +
     `client_id=${process.env.TTVclientID}&` +
-    `client_secret=${process.env.TTVclientS}`;
+    `client_secret=${process.env.TTVclientS}`
   const result = await fetch("https://id.twitch.tv/oauth2/token", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: body,
-  });
+    body,
+  })
 
   if (result.status == 400) {
-    db.update((data) => (data.refresh = null));
-    return null;
+    if (refresh)
+      db.update(data => data.refresh = null)
+    return null
   }
-  const obj = await result.json();
-  saveToken(obj);
-  return `Bearer ${obj.access_token}`;
+  const obj = await result.json()
+  await saveToken(obj);
+  return `Bearer ${obj.access_token}`
 }
 
-export class Err {
-  static set(error) {
-    this.error = error;
+export class Memory {
+  static setState(state) {
+    this.state = state
+    return state
   }
 
-  static get() {
+  static getState() {
+    return this.state
+  }
+
+  static setErr(error) {
+    this.error = error;
+    return error
+  }
+
+  static getErr() {
     return this.error;
   }
 }

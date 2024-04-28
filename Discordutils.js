@@ -1,6 +1,6 @@
 import fetch from 'node-fetch'
 
-const callback = process.env.callback
+const firebase = process.env.firebase
 
 export async function send(result) {
   const payload = {
@@ -13,12 +13,12 @@ export async function send(result) {
         "url": result.art
       },
       "image": {
-        "url": `${callback}media/thumbnail.png`
+        "url": getResource("thumbnail.png")
       },
       "author": {
         "name": "Stream announcement",
         "url": "https://twitch.tv/redynotredy",
-        "icon_url": `${callback}media/twitch.png`
+        "icon_url": getResource("twitch.png")
       },
       "color": 16711680,
       "fields": [{
@@ -35,12 +35,12 @@ export async function send(result) {
       "url": `https://www.youtube.com/channel/${process.env.TTVchannel}`,
       "description": "Catch it here on my second channel!",
       "thumbnail": {
-        "url": `${callback}media/inverted.png`
+        "url": getResource("inverted.png")
       },
       "author": {
         "name": "notredynot",
         "url": `https://www.youtube.com/channel/${process.env.TTVchannel}`,
-        "icon_url": `${callback}media/silver.png`
+        "icon_url": getResource("silver.png")
       },
       "color": 65280
     }]
@@ -54,6 +54,10 @@ export async function send(result) {
     body: JSON.stringify(payload)
   })
   console.log(await response.text())
+}
+
+function getResource(name) {
+  return `${firebase}/${name}?alt=media`
 }
 
 export async function sendError() {
