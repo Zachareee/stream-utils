@@ -11,7 +11,7 @@ app.use(express.static("static"));
 
 // app.use(express.raw({ type: "application/atom+xml", verify: verifyYTHash() }))
 
-app.use(express.json({ verify: verifyTTVHash() }));
+// app.use(express.json({ verify: verifyTTVHash() }));
 
 // YTroute(app)
 TTVroute(app);

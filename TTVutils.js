@@ -6,11 +6,13 @@ import { JSONFile } from "lowdb/node";
 const db = new Low(new JSONFile("./TTVdb.json"), {});
 db.read();
 
+const { callback, TTVclientID, TTVclientS, TTVsecret, TTVchannel } = process.env
+
 export function verifyTTVHash() {
   return (req, res, buf, encoding) => {
     const header = req.header("SHA1-Signature");
     const sigBuffer = Buffer.from(header, "hex");
-    const hash = createHmac("sha1", process.env.TTVsecret).update(buf).digest();
+    const hash = createHmac("sha1", TTVsecret).update(buf).digest();
     try {
       if (!timingSafeEqual(hash, sigBuffer)) {
         throw new Error("Bad request signature");
@@ -36,17 +38,17 @@ export async function check_state(test) {
 
 export async function use_code(code) {
   const body =
-    `client_id=${process.env.TTVclientID}&` +
-    `client_secret=${process.env.TTVclientS}&` +
+    `client_id=${TTVclientID}&` +
+    `client_secret=${TTVclientS}&` +
     `code=${code}&` +
     `grant_type=authorization_code&` +
-    `redirect_uri=${process.env.callback}ttv/auth`;
+    `redirect_uri=${callback}ttv/auth`;
   const result = await fetch("https://id.twitch.tv/oauth2/token", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: body,
+    body,
   });
 
   saveToken(await result.json());
@@ -58,20 +60,19 @@ export async function TTVinfo() {
   const options = {
     method: "GET",
     headers: {
-      "Client-Id": process.env.TTVclientID,
+      "Client-Id": TTVclientID,
       Authorization: token,
     },
   };
-  var endpoint = `https://api.twitch.tv/helix/channels?broadcaster_id=${process.env.TTVchannel}`;
-  var result = await fetch(endpoint, options);
-  var response = await result.json();
-  const { title, game_name: game, game_id: ID } = response.data[0];
+  const currentinfo = await fetch(`https://api.twitch.tv/helix/channels?broadcaster_id=${TTVchannel}`, options)
+    .then(result => result.json());
+  const { title, game_name: game, game_id: ID } = currentinfo.data[0];
 
-  endpoint = `https://api.twitch.tv/helix/games?id=${ID}`;
-  result = await fetch(endpoint, options);
-  response = await result.json();
-  const { box_art_url: art } = response.data[0];
-  return { title, game, art: `${art.split("-{width}x{height}")[0]}.jpg`,
+  const artjson = await fetch(`https://api.twitch.tv/helix/games?id=${ID}`, options)
+    .then(result => result.json())
+  const { box_art_url: art } = artjson.data[0];
+  return {
+    title, game, art: `${art.split("-{width}x{height}")[0]}.jpg`,
   };
 }
 
@@ -105,8 +106,8 @@ async function refreshToken() {
   const body =
     `grant_type=refresh_token&` +
     `refresh_token=${refresh}&` +
-    `client_id=${process.env.TTVclientID}&` +
-    `client_secret=${process.env.TTVclientS}`
+    `client_id=${TTVclientID}&` +
+    `client_secret=${TTVclientS}`
   const result = await fetch("https://id.twitch.tv/oauth2/token", {
     method: "POST",
     headers: {

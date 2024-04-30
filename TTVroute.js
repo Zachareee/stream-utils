@@ -13,7 +13,7 @@ export function TTVroute(app) {
       return res.status(401).send("Content empty")
     }
 
-    res.status(200).send(req.body.data)
+    res.status(200).send(req.body?.data)
     const obj = await TTVinfo()
     return obj ? send(obj) : sendError()
   })
