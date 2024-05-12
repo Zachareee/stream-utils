@@ -1,10 +1,21 @@
 import fetch from 'node-fetch'
 
-const firebase = process.env.firebase
+const { TTVrole, TTVchannel, Discordwebhook, firebase } = process.env
 
-export async function send(result) {
-  const payload = {
-    "content": `redynotredy is now live! <@&${process.env.TTVrole}>`,
+export function send(result) {
+  const payload = result ? success(result) : failure()
+  return fetch(Discordwebhook, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  })
+}
+
+function success(result) {
+  return {
+    "content": `redynotredy is now live! <@&${TTVrole}>`,
     "embeds": [{
       "title": result.title,
       "url": "https://twitch.tv/redynotredy",
@@ -27,47 +38,32 @@ export async function send(result) {
         "inline": true
       }, {
         "name": "Started:",
-        "value": `<t:${(parseInt(Date.now())/1000) ^ 0}:R>`,
+        "value": `<t:${(parseInt(Date.now()) / 1000) ^ 0}:R>`,
         "inline": true
       }]
     }, {
       "title": "Missed a stream?",
-      "url": `https://www.youtube.com/channel/${process.env.TTVchannel}`,
+      "url": `https://www.youtube.com/channel/${TTVchannel}`,
       "description": "Catch it here on my second channel!",
       "thumbnail": {
         "url": getResource("inverted.png")
       },
       "author": {
         "name": "notredynot",
-        "url": `https://www.youtube.com/channel/${process.env.TTVchannel}`,
+        "url": `https://www.youtube.com/channel/${TTVchannel}`,
         "icon_url": getResource("silver.png")
       },
       "color": 65280
     }]
   }
-
-  const response = await fetch(process.env.Discordwebhook, {
-    method: "POST", 
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(payload)
-  })
-  console.log(await response.text())
 }
+
+function failure() {
+  return {
+      content: `Something went wrong, either way redynotredy is live! <@&${TTVrole}>`
+  }
+}  
 
 function getResource(name) {
   return `${firebase}/${name}?alt=media`
-}
-
-export async function sendError() {
-  fetch(process.env.Discordwebhook, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      content: `Something went wrong, nevertheless redynotredy is live! <@&${process.env.TTVrole}>`
-    })
-  })
 }

@@ -1,5 +1,5 @@
 import { gen_state, check_state, use_code, TTVinfo, tokenEval, Memory } from './TTVutils.js'
-import { send, sendError } from './Discordutils.js'
+import { send } from './Discordutils.js'
 
 const path = process.cwd()
 
@@ -9,13 +9,9 @@ export function TTVroute(app) {
   })
 
   app.post("/ttv", async (req, res) => {
-    if (JSON.stringify(req.body) === '{}') {
-      return res.status(401).send("Content empty")
-    }
-
     res.status(200).send(req.body?.data)
     const obj = await TTVinfo()
-    return obj ? send(obj) : sendError()
+    return send(obj)
   })
 
   app.get("/ttv/auth", async (req, res) => {

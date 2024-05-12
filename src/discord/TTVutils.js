@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual, randomBytes } from "crypto";
+import { randomBytes } from "crypto";
 import fetch from "node-fetch";
 import { Low } from "lowdb";
 import { JSONFile } from "lowdb/node";
@@ -6,25 +6,7 @@ import { JSONFile } from "lowdb/node";
 const db = new Low(new JSONFile("./TTVdb.json"), {});
 db.read();
 
-const { callback, TTVclientID, TTVclientS, TTVsecret, TTVchannel } = process.env
-
-export function verifyTTVHash() {
-  return (req, res, buf, encoding) => {
-    const header = req.header("SHA1-Signature");
-    const sigBuffer = Buffer.from(header, "hex");
-    const hash = createHmac("sha1", TTVsecret).update(buf).digest();
-    try {
-      if (!timingSafeEqual(hash, sigBuffer)) {
-        throw new Error("Bad request signature");
-      }
-    } catch (err) {
-      console.error(err);
-      console.log(`Hash: ${hash.toString("hex")}, signature: ${header}`);
-      res.status(401).send("Bad request signature");
-      throw new Error("Bad request signature");
-    }
-  };
-}
+const { callback, TTVclientID, TTVclientS, TTVchannel } = process.env
 
 export function gen_state() {
   const buffer = randomBytes(20);
@@ -57,6 +39,7 @@ export async function use_code(code) {
 export async function TTVinfo() {
   const token = await tokenEval();
   if (!token) return null;
+
   const options = {
     method: "GET",
     headers: {
@@ -93,11 +76,10 @@ export async function tokenEval() {
   return await refreshToken();
 }
 
-async function saveToken(data) {
-  const { access_token: access = null, refresh_token: refresh = null } = data;
-  await db.update(data => {
-    data.token = `Bearer ${access}`
-    data.refresh = refresh
+function saveToken(res) {
+  db.update(data => {
+    data.token = `Bearer ${res.access_token}`
+    data.refresh = res.refresh_token
   })
 }
 
@@ -122,7 +104,7 @@ async function refreshToken() {
     return null
   }
   const obj = await result.json()
-  await saveToken(obj);
+  saveToken(obj);
   return `Bearer ${obj.access_token}`
 }
 
