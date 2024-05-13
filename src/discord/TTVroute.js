@@ -1,5 +1,7 @@
-import { gen_state, check_state, use_code, TTVinfo, tokenEval, Memory } from './TTVutils.js'
+import { gen_state, check_state, use_code, tokenEval } from '../TTVauth.js'
+import { TTVinfo } from './TTVutils.js'
 import { send } from './Discordutils.js'
+import Memory from '../Memory.js'
 
 const path = process.cwd()
 
@@ -10,8 +12,7 @@ export function TTVroute(app) {
 
   app.post("/ttv", async (req, res) => {
     res.status(200).send(req.body?.data)
-    const obj = await TTVinfo()
-    return send(obj)
+    return send(await TTVinfo())
   })
 
   app.get("/ttv/auth", async (req, res) => {
