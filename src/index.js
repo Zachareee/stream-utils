@@ -12,7 +12,7 @@ app.use(express.static("static"))
 app.engine("html", renderFile)
 const path = process.cwd()
 
-const client = initChatBot()
+var client = await initChatBot()
 
 app.get("/", async function (req, res) {
   return res.sendFile(path + "/public/index.html")
@@ -39,7 +39,10 @@ app.get("/ttv/auth", async (req, res) => {
   if (!check_state(state)) return res.render(path + "/public/authFail.html", { error: "Bad state" })
   if (error) return res.render(path + "/public/authFail.html", { error: `${error} ${desc}` })
 
-  use_code(code)
+  await use_code(code)
+  if (client.readyState() === "CLOSED")
+    client = await initChatBot()
+
   return res.redirect("/ttv")
 })
 
