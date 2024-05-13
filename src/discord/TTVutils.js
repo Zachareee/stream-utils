@@ -1,4 +1,4 @@
-import { tokenEval } from "../TTVauth"
+import { tokenEval } from "../TTVauth.js"
 
 const { TTVclientID, TTVchannel } = process.env
 

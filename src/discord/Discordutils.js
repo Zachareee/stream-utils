@@ -1,6 +1,6 @@
 import fetch from 'node-fetch'
 
-const { TTVrole, TTVchannel, Discordwebhook, firebase } = process.env
+const { TTVrole, TTVchannel, Discordwebhook, firebase, DISC_ID, DISC_TOKEN } = process.env
 
 export function send(result) {
   const payload = result ? success(result) : failure()
@@ -10,6 +10,26 @@ export function send(result) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify(payload)
+  })
+}
+
+export async function DM(message) {
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bot ${DISC_TOKEN}`
+  }
+
+  fetch("https://discord.com/api/v10/users/@me/channels", {
+    method: "POST",
+    headers: headers,
+    body: JSON.stringify({recipient_id: DISC_ID})
+  }).then(async result => {
+    const { id } = await result.json()
+    fetch(`https://discord.com/api/v10/channels/${id}/messages`, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify({content: message})
+    })
   })
 }
 

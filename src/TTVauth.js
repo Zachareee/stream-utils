@@ -1,7 +1,8 @@
 import { randomBytes } from "crypto"
 import fetch from "node-fetch"
-import { getTokens, saveToken } from "./store"
-import Memory from "./Memory"
+import { getTokens, saveToken } from "./store.js"
+import Memory from "./Memory.js"
+import { DM } from "./discord/Discordutils.js"
 
 const { callback, TTVclientID, TTVclientS } = process.env
 
@@ -66,6 +67,7 @@ async function refreshToken() {
   if (result.status == 400) {
     // if (refresh)
     //   db.update(data => data.refresh = null)
+    DM("Refresh access token")
     return null
   }
 
