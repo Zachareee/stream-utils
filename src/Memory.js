@@ -1,3 +1,5 @@
+import { DM } from "./discord/Discordutils.js"
+
 export default class Memory {
   static setState(state) {
     this.state = state
@@ -33,7 +35,7 @@ export default class Memory {
       return null
     }
 
-    const link = arr.pop()
+    const link = this.arr.pop()
     return link
   }
 }
