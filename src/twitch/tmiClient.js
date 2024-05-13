@@ -1,12 +1,15 @@
 import { Client } from "tmi.js"
 import { tokenEval } from "./TTVauth.js"
-import { matchCommand } from "./chatCommands.js"
+import { matchCommand } from "./commandUtils.js"
 
 export async function initChatBot() {
     const token = await tokenEval()
 
     const client = Client({
         options: { debug: true },
+        connection: {
+            maxReconnectAttempts: 3
+        },
         identity: {
             username: 'notredynot',
             password: `oauth:${token}`
@@ -25,7 +28,7 @@ export async function initChatBot() {
             message = message.substring(1)
             const command = matchCommand(message)
             if (command)
-                command.callback(channel, tags, message, client)
+                return command.callback(channel, tags, message, client)
 
             client.say(channel, `@${username} Unknown command, try $help for all commands, or $help COMMAND for a specific command`)
         }

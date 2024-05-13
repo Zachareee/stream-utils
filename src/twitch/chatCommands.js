@@ -1,10 +1,11 @@
 import Memory from "../Memory.js"
+import { matchCommand } from "./commandUtils.js"
 
-const commands = [
+export const commands = [
     {
         regex: /help/,
         lastUsed: 0,
-        cooldown: 10000,
+        cooldown: 1000,
         callback: helpCommand,
         details: {
             title: "Help command",
@@ -25,22 +26,6 @@ const commands = [
     }
 ]
 
-export function matchCommand(message, bool) {
-    for (const idx in commands) {
-        const command = commands[idx]
-        if (message.match(command.regex)) {
-            if (bool) return command
-            return updateCD(command)
-        }
-    }
-}
-
-function updateCD(command) {
-    if (Date.now() - command.lastUsed <= command.cooldown) return console.log(`${command} skipped`)
-    command.lastUsed = Date.now()
-    return command
-}
-
 function joinCommand(channel, tags, message, client) {
     const { "user-id": userId, username, color } = tags
     const link = Memory.getLink()
@@ -59,18 +44,25 @@ function helpCommand(channel, tags, message, client) {
     }
 
     arr.shift()
-    return client.say(channel, displayHelp(arr))
+    return client.say(channel, displayHelp(arr).join("\n"))
 }
 
 function displayHelp(arr) {
-    if (!arr) arr = commands
-
     const reply = []
+    if (!arr) {
+        for (const command of commands) {
+            const { title, description, usage } = command.details
+            reply.push(title, description, `Examples: ${usage.join()}`)
+        }
+
+        return reply
+    }
+
     for (const text of arr) {
         const command = matchCommand(text, true)
         if (command) {
-            const { title, details, usage } = command
-            reply.push(title, details, `Examples: ${usage.join()}`)
+            const { title, description, usage } = command
+            reply.push(title, description, `Examples: ${usage.join()}`)
         }
     }
 

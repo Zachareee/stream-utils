@@ -13,7 +13,7 @@ export function generateAuthUrl() {
     redirect_uri: `${callback}ttv/auth`,
     response_type: "code",
     scope: scope.map(word => encodeURIComponent(word)).join("+"),
-    force_verify: true,
+    force_verify: false,
     state: gen_state()
   }
 
