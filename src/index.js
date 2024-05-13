@@ -1,14 +1,15 @@
 import express from "express"
 import { initChatBot } from "./twitch/tmiClient.js"
-import { gen_state, check_state, use_code, tokenEval } from './twitch/TTVauth.js'
+import { check_state, use_code, tokenEval, generateAuthUrl } from './twitch/TTVauth.js'
 import { TTVinfo } from './twitch/TTVutils.js'
 import { announce } from './discord/Discordutils.js'
-import Memory from './Memory.js'
+import { renderFile } from "ejs"
 
 const app = express()
 const PORT = process.env.PORT || 3000
 
 app.use(express.static("static"))
+app.engine("html", renderFile)
 const path = process.cwd()
 
 const client = initChatBot()
@@ -22,7 +23,10 @@ app.get("/tts", async (req, res) => {
 })
 
 app.get("/ttv", async (req, res) => {
-  return res.sendFile(path + "/public/auth.html")
+  return res.render(path + "/public/auth.html", {
+    auth: await tokenEval() ? "Authorisation successful" : "Login again",
+    authlink: generateAuthUrl()
+  })
 })
 
 app.post("/ttv", async (req, res) => {
@@ -32,26 +36,11 @@ app.post("/ttv", async (req, res) => {
 
 app.get("/ttv/auth", async (req, res) => {
   const { state, error, code, error_description: desc } = req.query
-  if (!await check_state(state)) {
-    Memory.setErr("Bad state")
-    return res.sendFile(path + "/public/authFail.html")
-  }
-  if (error) {
-    Memory.setErr(error + '\n' + desc)
-    return res.sendFile(path + "/public/authFail.html")
-  }
+  if (!check_state(state)) return res.render(path + "/public/authFail.html", { error: "Bad state" })
+  if (error) return res.render(path + "/public/authFail.html", { error: `${error} ${desc}` })
+
   use_code(code)
   return res.redirect("/ttv")
-})
-
-app.get("/state", async (req, res) => {
-  const auth = !!await tokenEval()
-  return res.send({ state: gen_state(), auth })
-})
-
-app.get("/error", async (req, res) => {
-  console.log(Memory.getErr())
-  return res.send(Memory.getErr())
 })
 
 app.listen(PORT, () => {

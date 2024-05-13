@@ -10,15 +10,6 @@ export default class Memory {
     return this.state
   }
 
-  static setErr(error) {
-    this.error = error;
-    return error
-  }
-
-  static getErr() {
-    return this.error;
-  }
-
   static addLink(link) {
     if (!this.arr) {
       this.arr = [link]

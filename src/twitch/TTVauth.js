@@ -6,13 +6,29 @@ import { DM } from "../discord/Discordutils.js"
 
 const { callback, TTVclientID, TTVclientS } = process.env
 
+export function generateAuthUrl() {
+  const scope = ["chat:read", "chat:edit", "user:manage:whispers"]
+  const params = {
+    client_id: TTVclientID,
+    redirect_uri: `${callback}ttv/auth`,
+    response_type: "code",
+    scope: scope.map(word => encodeURIComponent(word)).join("+"),
+    force_verify: true,
+    state: gen_state()
+  }
+
+  return `https://id.twitch.tv/oauth2/authorize?${Object.entries(params)
+    .map(([key, value]) => `${key}=${value}`)
+    .join("&")}`
+}
+
 export function gen_state() {
   const buffer = randomBytes(20)
   const state = buffer.toString("hex")
   return Memory.setState(state)
 }
 
-export async function check_state(test) {
+export function check_state(test) {
   return Memory.getState() === test
 }
 

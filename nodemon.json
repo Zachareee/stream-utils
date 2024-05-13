@@ -1,4 +1,3 @@
 {
-    "ignore": ["*.json"],
-    "exclude": ["static", "public"]
+    "ignore": ["*.json", "static/*", "public/*"]
 }
