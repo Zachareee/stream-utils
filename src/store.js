@@ -1,7 +1,7 @@
-import { Low } from "lowdb";
-import { JSONFile } from "lowdb/node";
+import { LowSync } from "lowdb";
+import { JSONFileSync } from "lowdb/node";
 
-const db = new Low(new JSONFile("./TTVdb.json"), {});
+const db = new LowSync(new JSONFileSync("./TTVdb.json"), {});
 
 export function getTokens() {
     db.read()

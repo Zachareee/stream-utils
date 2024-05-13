@@ -1,9 +1,9 @@
 import { Client } from "tmi.js"
-import { tokenEval } from "./TTVauth.js"
+import { refreshToken } from "./TTVauth.js"
 import { matchCommand } from "./commandUtils.js"
 
 export async function initChatBot() {
-    const token = await tokenEval()
+    const token = await refreshToken()
 
     const client = Client({
         options: { debug: true },

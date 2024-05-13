@@ -1,3 +1,4 @@
 {
-    "ignore": ["*.json", "static/*", "public/*"]
+    "ignore": ["*.json", "static/*", "public/*"],
+    "signal": "SIGTERM"
 }

@@ -65,7 +65,7 @@ export async function tokenEval() {
   return await refreshToken()
 }
 
-async function refreshToken() {
+export async function refreshToken() {
   const { refresh } = getTokens()
   const body =
     `grant_type=refresh_token&` +
@@ -83,11 +83,12 @@ async function refreshToken() {
   if (result.status == 400) {
     // if (refresh)
     //   db.update(data => data.refresh = null)
+    console.log(await result.json())
     DM("Refresh access token")
     return null
   }
 
   const obj = await result.json()
   saveToken(obj)
-  return `Bearer ${obj.access_token}`
+  return obj.access_token
 }

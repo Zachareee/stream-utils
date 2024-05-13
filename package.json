@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "dotenvx run -- nodemon --exec \"npm run lint && node src/index.js\"",
+    "dev": "dotenvx run -- node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src"
   },

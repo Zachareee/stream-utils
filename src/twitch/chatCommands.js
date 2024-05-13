@@ -5,7 +5,7 @@ export const commands = [
     {
         regex: /help/,
         lastUsed: 0,
-        cooldown: 1000,
+        cooldown: 600000,
         callback: helpCommand,
         details: {
             title: "Help command",
@@ -39,32 +39,36 @@ function joinCommand(channel, tags, message, client) {
 
 function helpCommand(channel, tags, message, client) {
     const arr = message.split(" ")
-    if (arr.length == 1) {
-        return client.say(channel, displayHelp())
+    const reply = []
+    if (arr.length == 1)
+        displayHelp(reply)
+    else {
+        arr.shift()
+        displayHelp(reply, arr)
     }
 
-    arr.shift()
-    return client.say(channel, displayHelp(arr).join("\n"))
+    for (const str of reply)
+        client.say(channel, str)
 }
 
-function displayHelp(arr) {
-    const reply = []
+function displayHelp(reply, arr) {
     if (!arr) {
-        for (const command of commands) {
-            const { title, description, usage } = command.details
-            reply.push(title, description, `Examples: ${usage.join()}`)
-        }
+        for (const command of commands)
+            appendCommands(reply, command)
 
         return reply
     }
 
     for (const text of arr) {
         const command = matchCommand(text, true)
-        if (command) {
-            const { title, description, usage } = command
-            reply.push(title, description, `Examples: ${usage.join()}`)
-        }
+        if (command)
+            appendCommands(reply, command)
     }
 
     return reply
+}
+
+function appendCommands(arr, command) {
+    const { title, description, usage } = command.details
+    arr.push(`${title}: ${description}. Examples: ${usage.join()}`)
 }

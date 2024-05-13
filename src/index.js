@@ -46,6 +46,17 @@ app.get("/ttv/auth", async (req, res) => {
   return res.redirect("/ttv")
 })
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`)
+})
+
+process.on("SIGINT", async () => {
+  await client.disconnect()
+  server.close((err) => {
+    if (err) {
+      console.error(err)
+      process.exit(1)
+    }
+    process.exit()
+  })
 })
