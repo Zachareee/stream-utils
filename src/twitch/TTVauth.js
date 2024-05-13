@@ -1,8 +1,8 @@
 import { randomBytes } from "crypto"
 import fetch from "node-fetch"
-import { getTokens, saveToken } from "./store.js"
-import Memory from "./Memory.js"
-import { DM } from "./discord/Discordutils.js"
+import { getTokens, saveToken } from "../store.js"
+import Memory from "../Memory.js"
+import { DM } from "../discord/Discordutils.js"
 
 const { callback, TTVclientID, TTVclientS } = process.env
 

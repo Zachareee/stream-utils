@@ -2,7 +2,7 @@ import fetch from 'node-fetch'
 
 const { TTVrole, TTVchannel, Discordwebhook, firebase, DISC_ID, DISC_TOKEN } = process.env
 
-export function send(result) {
+export function announce(result) {
   const payload = result ? success(result) : failure()
   return fetch(Discordwebhook, {
     method: "POST",
