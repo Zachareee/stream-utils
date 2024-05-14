@@ -1,5 +1,5 @@
 import express from "express"
-import { initChatBot } from "./twitch/tmiClient.js"
+import { initChatBot } from "./twitch/chatbot/tmiClient.js"
 import { check_state, use_code, tokenEval, generateAuthUrl } from './twitch/TTVauth.js'
 import { TTVinfo } from './twitch/TTVutils.js'
 import { announce } from './discord/Discordutils.js'

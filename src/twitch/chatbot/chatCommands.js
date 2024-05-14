@@ -1,4 +1,4 @@
-import Memory from "../Memory.js"
+import Memory from "../../Memory.js"
 import { matchCommand } from "./commandUtils.js"
 
 export const commands = [
