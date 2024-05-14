@@ -27,7 +27,7 @@ export const commands = [
 ]
 
 function joinCommand(channel, tags, message, client) {
-    const { "user-id": userId, username, color } = tags
+    const { "user-id": userId, username } = tags
     const link = Memory.getLink()
     console.log(link)
     if (!link) {

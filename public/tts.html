@@ -4,8 +4,14 @@
         <title>Text to Speech</title>
     </head>
     <body>
-        <button onclick="onClick()">Talk</button>
-        <input></input>
+        <div id="chat"></div>
     </body>
+    <script src="/socket.io/socket.io.js"></script>
     <script src="/script/tts.js"></script>
+    <style>
+        span {
+            font-family: "Inter", "Roobert", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color:white;
+        }
+    </style>
 </html>

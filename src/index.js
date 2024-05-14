@@ -4,14 +4,20 @@ import { check_state, use_code, tokenEval, generateAuthUrl } from './twitch/TTVa
 import { TTVinfo } from './twitch/TTVutils.js'
 import { announce } from './discord/Discordutils.js'
 import { renderFile } from "ejs"
+import { ioSetup } from "./twitch/overlays/chatOverlay.js"
 
 const app = express()
 const PORT = process.env.PORT || 3000
+
+const server = app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}`)
+})
 
 app.use(express.static("static"))
 app.engine("html", renderFile)
 const path = process.cwd()
 
+export const io = ioSetup(server)
 var client = await initChatBot()
 
 app.get("/", async function (req, res) {
@@ -46,12 +52,8 @@ app.get("/ttv/auth", async (req, res) => {
   return res.redirect("/ttv")
 })
 
-const server = app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}`)
-})
-
 process.on("SIGINT", async () => {
-  await client.disconnect()
+  await client.disconnect().catch(console.warn)
   server.close((err) => {
     if (err) {
       console.error(err)
