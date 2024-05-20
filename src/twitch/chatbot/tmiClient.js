@@ -3,6 +3,7 @@ import { tokenEval } from "../TTVauth.js"
 import { matchCommand } from "./commandUtils.js"
 import { io } from "../../index.js"
 import { receiveMessage } from "../overlays/chatOverlay.js"
+import { getUser } from "../../store.js"
 
 export async function initChatBot() {
     const token = await tokenEval()
@@ -13,7 +14,7 @@ export async function initChatBot() {
             maxReconnectAttempts: 3
         },
         identity: {
-            username: 'notredynot',
+            username: getUser(),
             password: `oauth:${token}`
         },
         channels: ['redynotredy']
@@ -30,11 +31,13 @@ export async function initChatBot() {
         const { username } = tags
         message = message.substring(1)
 
-        const command = matchCommand(message)
-        if (command)
-            return command.callback(channel, tags, message, client)
-
-        client.say(channel, `@${username} Unknown command, try $help for all commands, or $help COMMAND for a specific command`)
+        try {
+            const command = matchCommand(message)
+            if (command)
+                return command.callback(channel, tags, message, client)
+        } catch {
+            client.say(channel, `@${username} Unknown command, try $help for all commands, or $help COMMAND for a specific command`)
+        }
     })
 
     return client

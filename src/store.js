@@ -14,3 +14,14 @@ export function saveToken(res) {
     data.refresh = res.refresh_token
   })
 }
+
+export function getUser() {
+    db.read()
+    return db.data.user
+}
+
+export function saveUser(user) {
+  db.update(data => {
+    data.user = user
+  })
+}

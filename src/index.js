@@ -31,7 +31,7 @@ app.get("/tts", async (req, res) => {
 app.get("/ttv", async (req, res) => {
   return res.render(path + "/public/auth.html", {
     auth: await tokenEval() ? "Authorisation successful" : "Login again",
-    authlink: generateAuthUrl()
+    authlink: generateAuthUrl(getCallbackURL(req))
   })
 })
 
@@ -45,12 +45,20 @@ app.get("/ttv/auth", async (req, res) => {
   if (!check_state(state)) return res.render(path + "/public/authFail.html", { error: "Bad state" })
   if (error) return res.render(path + "/public/authFail.html", { error: `${error} ${desc}` })
 
-  await use_code(code)
-  if (client.readyState() === "CLOSED")
-    client = await initChatBot()
+  await use_code(code, getCallbackURL(req))
+
+  try {
+    client.disconnect()
+  } catch (err) {
+    console.warn(err)
+  }
+
+  client = await initChatBot()
 
   return res.redirect("/ttv")
 })
+
+const getCallbackURL = (req) => `${req.protocol}://${req.hostname}:${PORT}/`
 
 process.on("SIGINT", async () => {
   await client.disconnect().catch(console.warn)

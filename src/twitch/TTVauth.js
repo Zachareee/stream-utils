@@ -1,12 +1,12 @@
 import { randomBytes } from "crypto"
 import fetch from "node-fetch"
-import { getTokens, saveToken } from "../store.js"
+import { getTokens, saveToken, saveUser } from "../store.js"
 import Memory from "../Memory.js"
 import { DM } from "../discord/Discordutils.js"
 
-const { callback, TTVclientID, TTVclientS } = process.env
+const { TTVclientID, TTVclientS } = process.env
 
-export function generateAuthUrl() {
+export function generateAuthUrl(callback) {
   const scope = ["chat:read", "chat:edit", "user:manage:whispers"]
   const params = {
     client_id: TTVclientID,
@@ -32,7 +32,7 @@ export function check_state(test) {
   return Memory.getState() === test
 }
 
-export async function use_code(code) {
+export async function use_code(code, callback) {
   const body =
     `client_id=${TTVclientID}&` +
     `client_secret=${TTVclientS}&` +
@@ -59,6 +59,7 @@ export async function tokenEval() {
   })
 
   if (result.status == 200) {
+    saveUser((await result.json()).login)
     return token
   }
 

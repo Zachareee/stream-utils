@@ -1,12 +1,14 @@
 import { commands } from "./chatCommands.js"
 
-export function matchCommand(message, bool) {
+export function matchCommand(message, skip) {
     for (const command of commands) {
         if (message.match(command.regex)) {
-            if (bool) return command
+            if (skip) return command
             return updateCD(command)
         }
     }
+
+    throw new Error("No command found")
 }
 
 function updateCD(command) {
