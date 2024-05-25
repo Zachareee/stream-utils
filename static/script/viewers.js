@@ -1,4 +1,5 @@
 const table = document.querySelector("table")
+const count = document.querySelector("#viewercount")
 const socket = io()
 
 socket.on("join", user => {
@@ -7,6 +8,7 @@ socket.on("join", user => {
 
 socket.on("leave", user => {
   document.querySelector(`#${user}`)?.remove()
+  changeCount(-1)
 })
 
 socket.emit("request", (arr) => {
@@ -14,8 +16,13 @@ socket.emit("request", (arr) => {
 })
 
 function appendRow(user) {
+  changeCount(1)
   const row = document.createElement("tr")
   row.innerHTML = user
   row.id = user
   table.appendChild(row)
+}
+
+function changeCount(num) {
+  count.innerHTML = parseInt(count.innerHTML) + num
 }

@@ -2,27 +2,22 @@
 <html>
 
 <head>
-    <title>Text to Speech</title>
+    <title>Viewers</title>
+    <link rel="stylesheet" href="/style/viewers.css"></link>
 </head>
 
 <body>
-    <div>
-        <table>
+    <div id="wrapper">
+        <div class="center">
+            <span id="viewercount">0</span>
+            <span> viewers</span>
+        </div>
+        <br>
+        <table class="center">
         </table>
     </div>
 </body>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/script/viewers.js"></script>
-<style>
-    tr {
-        font-family: "Inter", "Roobert", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    }
-
-    table {
-        margin: auto;
-        width: 100%;
-        text-align: center;
-    }
-</style>
 
 </html>
