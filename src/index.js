@@ -1,10 +1,9 @@
 import express from "express"
-import { initChatBot } from "./twitch/chatbot/tmiClient.js"
+import { initChatBot } from "./twitch/tmiClient.js"
 import { check_state, use_code, tokenEval, generateAuthUrl } from './twitch/TTVauth.js'
 import { TTVinfo } from './twitch/TTVutils.js'
 import { announce } from './discord/Discordutils.js'
 import { renderFile } from "ejs"
-import { ioSetup } from "./twitch/overlays/chatOverlay.js"
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -17,19 +16,22 @@ app.use(express.static("static"))
 app.engine("html", renderFile)
 const path = process.cwd()
 
-export const io = ioSetup(server)
-var client = await initChatBot()
+var client = await initChatBot(server)
 
 app.get("/", async function (req, res) {
-  return res.sendFile(path + "/public/index.html")
+  return res.sendFile(path + "/static/index.html")
 })
 
-app.get("/tts", async (req, res) => {
-  return res.sendFile(path + "/public/tts.html")
+app.get("/chat", async (req, res) => {
+  return res.sendFile(path + "/static/chat.html")
+})
+
+app.get("/viewers", async (req, res) => {
+  return res.sendFile(path + "/static/viewers.html")
 })
 
 app.get("/ttv", async (req, res) => {
-  return res.render(path + "/public/auth.html", {
+  return res.render(path + "/static/auth.html", {
     auth: await tokenEval() ? "Authorisation successful" : "Login again",
     authlink: generateAuthUrl(getCallbackURL(req))
   })
@@ -42,8 +44,8 @@ app.post("/ttv", async (req, res) => {
 
 app.get("/ttv/auth", async (req, res) => {
   const { state, error, code, error_description: desc } = req.query
-  if (!check_state(state)) return res.render(path + "/public/authFail.html", { error: "Bad state" })
-  if (error) return res.render(path + "/public/authFail.html", { error: `${error} ${desc}` })
+  if (!check_state(state)) return res.render(path + "/static/authFail.html", { error: "Bad state" })
+  if (error) return res.render(path + "/static/authFail.html", { error: `${error} ${desc}` })
 
   await use_code(code, getCallbackURL(req))
 
@@ -67,6 +69,7 @@ process.on("SIGINT", async () => {
       console.error(err)
       process.exit(1)
     }
-    process.exit()
   })
+
+  process.exit()
 })
